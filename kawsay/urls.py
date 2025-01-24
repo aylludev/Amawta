@@ -21,5 +21,6 @@ from wasi.views import IndexView
 urlpatterns = [
     path('polls/', include('polls.urls')),
     path('admin/', admin.site.urls),
+    path('login/', include('login.urls')),
     path('', IndexView.as_view()),
 ]
