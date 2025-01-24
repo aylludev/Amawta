@@ -16,9 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from wasi.views import IndexView
 
 urlpatterns = [
     path('polls/', include('polls.urls')),
     path('admin/', admin.site.urls),
-    path('', include('wasi.urls')),
+    path('', IndexView.as_view()),
 ]

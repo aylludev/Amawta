@@ -1,1 +1,6 @@
+# Excluir entorno virtual
 .env
+# Excluir archivos y carpetas de caché de Python
+__pycache__/
+*.py[cod]
+
