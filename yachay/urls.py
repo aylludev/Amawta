@@ -2,8 +2,8 @@ from django.urls import path
 from yachay.views.tags.views import *
 
 urlpatterns = [
-    path('tags/list/', TagListView.as_view(), name='category_list'),
+    path('tags/list/', TagListView.as_view(), name='tag_list'),
     path('tags/add/', TagCreateView.as_view(), name='tag_create'),
-    path('tags/update/<int:pk>/', CategoryUpdateView.as_view(), name='category_update'),
-    path('tags/delete/<int:pk>/', CategoryDeleteView.as_view(), name='category_delete'),
+    path('tags/update/<int:pk>/', TagUpdateView.as_view(), name='tag_update'),
+    path('tags/delete/<int:pk>/', TagDeleteView.as_view(), name='tag_create_delete'),
 ]

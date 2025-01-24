@@ -42,7 +42,7 @@
                 <a href="{{ create_url }}" class="btn btn-primary btn-flat btnTest">
                     <i class="fas fa-plus"></i> Nuevo registro
                 </a>
-                <a href="{{ list_url }}" class="btn btn-success btn-flat">
+                <a href=" {{ list_url }} " class="btn btn-success btn-flat">
                     <i class="fas fa-sync"></i> Actualizar
                 </a>
             {% endblock %}
@@ -60,9 +60,9 @@
 
             $('.btnTest').on('click', function () {
                 $.ajax({
-                    url: '{% url 'erp:category_list' %}',
+                    url: '{% url 'tag_list' %}',
                     type: 'POST',
-                    data: {id: 1},
+                    data: {id},
                     dataType: 'json'
                 }).done(function (data) {
                     console.log(data);

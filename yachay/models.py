@@ -1,11 +1,17 @@
 from django.db import models
-
+from django.forms import model_to_dict
 # Modelo para Etiquetas
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
-
+    
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+    
     def __str__(self):
         return self.name
+
 
 # Modelo para Autores
 class Author(models.Model):
@@ -61,4 +67,4 @@ class Media(models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name="media_files")
 
     def __str__(self):
-        return f"{self.file_path} ({self.get_file_type_display()})"# Create your models here.
+        return f"{self.file_path} ({self.get_file_type_display()})"

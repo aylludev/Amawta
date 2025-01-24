@@ -32,10 +32,10 @@ class TagListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Listado de Categorías'
-        context['create_url'] = reverse_lazy('')
-        context['list_url'] = reverse_lazy('')
-        context['entity'] = 'Categorias'
+        context['title'] = 'Listado de Etiquetas'
+        context['create_url'] = reverse_lazy('tag_create')
+        context['list_url'] = reverse_lazy('tag_list')
+        context['entity'] = 'Tags'
         return context
 
 
@@ -43,7 +43,7 @@ class TagCreateView(CreateView):
     model = Tag
     form_class = TagForm
     template_name = 'tags/create.html'
-    success_url = reverse_lazy('')
+    success_url = reverse_lazy('tag_list')
 
     def post(self, request, *args, **kwargs):
         data = {}
@@ -62,16 +62,16 @@ class TagCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Creación una Etqueta'
         context['entity'] = 'Etiquetas'
-        context['list_url'] = reverse_lazy('')
+        context['list_url'] = reverse_lazy('tag_list')
         context['action'] = 'add'
         return context
 
 
-class CategoryUpdateView(UpdateView):
+class TagUpdateView(UpdateView):
     model = Tag
     form_class = TagForm
-    template_name = 'category/create.html'
-    success_url = reverse_lazy('')
+    template_name = 'tags/create.html'
+    success_url = reverse_lazy('tag_list')
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -92,17 +92,17 @@ class CategoryUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Edición una Categoria'
-        context['entity'] = 'Categorias'
-        context['list_url'] = reverse_lazy('')
+        context['title'] = 'Edición una Etiqueta'
+        context['entity'] = 'Tag'
+        context['list_url'] = reverse_lazy('tag_list')
         context['action'] = 'edit'
         return context
 
 
-class CategoryDeleteView(DeleteView):
+class TagDeleteView(DeleteView):
     model = Tag
-    template_name = 'category/delete.html'
-    success_url = reverse_lazy('')
+    template_name = 'tags/delete.html'
+    success_url = reverse_lazy('tag_list')
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -118,7 +118,7 @@ class CategoryDeleteView(DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Eliminación de una Categoria'
-        context['entity'] = 'Categorias'
-        context['list_url'] = reverse_lazy('')
+        context['title'] = 'Eliminación de Etiqueta'
+        context['entity'] = 'Tag'
+        context['list_url'] = self.success_url
         return context
