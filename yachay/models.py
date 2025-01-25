@@ -41,6 +41,10 @@ class Note(models.Model):
 
     def __str__(self):
         return f"Note {self.zettel_id}"
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
 
 
 # Modelo para la relación many-to-many entre Note y Tag
