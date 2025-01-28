@@ -60,7 +60,7 @@ class TagCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Creación una Etqueta'
+        context['title'] = 'Creación una Etiqueta'
         context['entity'] = 'Etiquetas'
         context['list_url'] = reverse_lazy('tag_list')
         context['action'] = 'add'

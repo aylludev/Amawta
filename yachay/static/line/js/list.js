@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
   $('#data').DataTable({
     responsive: true,
     autoWidth: false,
@@ -14,24 +14,22 @@ $(function() {
     },
     columns: [
       { "data": "id" },
-      { "data": "content" },
-      { "data": "zettel_id" },
-      { "data": "category" },
-      { "data": "resource" },
+      { "data": "name" },
+      { "data": "desc" },
     ],
     columnDefs: [
       {
         targets: [-1],
         class: 'text-center',
         orderable: false,
-        render: function(data, type, row) {
-          var buttons = '<a href="/yachay/notes/update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-          buttons += '<a href="/yachay/notes/delete/' + row.id + '/" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+        render: function (data, type, row) {
+          var buttons = '<a href="/yachay/lines/update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+          buttons += '<a href="/yachay/lines/delete/' + row.id + '/" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
           return buttons;
         }
       },
     ],
-    initComplete: function(settings, json) {
+    initComplete: function (settings, json) {
 
     }
   });

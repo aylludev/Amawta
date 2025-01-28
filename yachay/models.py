@@ -1,9 +1,9 @@
 from django.db import models
 from django.forms import model_to_dict
+
 # Modelo para Etiquetas
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    
     
     def toJSON(self):
         item = model_to_dict(self)
@@ -12,6 +12,16 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+# Modelo para Lineas
+class Line(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+    
+    def __str__(self):
+        return self.name
 
 # Modelo para Autores
 class Author(models.Model):
@@ -51,6 +61,16 @@ class Note(models.Model):
 class NoteTag(models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name="note_tags")
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name="note_tags")
+    created_at = models.DateTimeField(auto_now_add=True)  # Fecha de asociación
+
+    def __str__(self):
+        return f"Tag '{self.tag.name}' for Note '{self.note.zettel_id}'"
+
+
+# Modelo para la relación many-to-many entre Note y Line
+class NoteLine(models.Model):
+    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name="note_lines")
+    tag = models.ForeignKey(Line, on_delete=models.CASCADE, related_name="note_lines")
     created_at = models.DateTimeField(auto_now_add=True)  # Fecha de asociación
 
     def __str__(self):

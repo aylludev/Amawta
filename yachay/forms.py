@@ -1,15 +1,12 @@
 from django import forms
 from django.db.models import Model
-from django.forms import ModelForm, TextInput, fields, widgets
+from django.forms import Form, ModelForm, TextInput, fields, widgets
 from yachay.models import *
 
 
 class TagForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # for form in self.visible_fields():
-        #     form.field.widget.attrs['class'] = 'form-control'
-        #     form.field.widget.attrs['autocomplete'] = 'off'
         self.fields['name'].widget.attrs['autofocus'] = True
 
     class Meta:
@@ -34,6 +31,22 @@ class TagForm(ModelForm):
         except Exception as e:
             data['error'] = str(e)
         return data
+
+class LineForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['autofocus'] = True
+
+    class Meta:
+        model = Line
+        fields = '__all__'
+        widgets = {
+            'name': TextInput(
+                attrs={
+                    'placeholder': 'ejemplo: filosofía',
+                }
+            ),
+        }
 
 class NoteForm(ModelForm):
     def __init__(self, *args, **kwargs):
