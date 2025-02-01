@@ -14,10 +14,12 @@ $(function() {
     },
     columns: [
       { "data": "id" },
+      { "data": "code" },
+      { "data": "title" },
       { "data": "content" },
-      { "data": "zettel_id" },
-      { "data": "category" },
-      { "data": "resource" },
+      { "data": "line" },
+      { "data": "tags" },
+      { "data": "desc" }
     ],
     columnDefs: [
       {

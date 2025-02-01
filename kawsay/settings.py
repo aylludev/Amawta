@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'yachay',
     'wasi',
     'widget_tweaks',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

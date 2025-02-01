@@ -66,12 +66,10 @@ class NoteForm(ModelForm):
     
     class Meta:
         model = Note
-        fields = ['content', 'zettel_id', 'category', 'resource']
+        fields = ['title', 'content', 'line', 'tags']
         widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Titulo'}),
             'content': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Escribe el contenido aquí'}),
-            'zettel_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ID único'}),
-            'category': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Categoría'}),
-            'resource': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def save(self, commit=True):
@@ -86,17 +84,13 @@ class NoteForm(ModelForm):
             data['error'] = str(e)
         return data
 
-class NoteTagForm(ModelForm):
+class NoteLinkForm(ModelForm):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, *kwargs)
-        self.fields['tag'].widget.attrs['autofocus'] = True
+        super().__init__(*args, **kwargs)
     
     class Meta:
-        model = NoteTag
-        fields = ['tag']
-        widgets = {
-            'tag': forms.Select(attrs={'class': 'form-control'}),
-        }
+        model = NoteLink
+        fields = ['source', 'target']
 
     def save(self, commit=True):
         data = {}

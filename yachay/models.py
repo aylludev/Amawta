@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms import model_to_dict
+from django.utils.timezone import now
 
 # Modelo para Etiquetas
 class Tag(models.Model):
@@ -40,42 +41,49 @@ class Author(models.Model):
     def __str__(self):
         return f"{self.name} ({self.get_type_display()})"
 
-
-# Modelo para Notas
 class Note(models.Model):
+    """Represents a note in the Zettelkasten system."""
+    code = models.CharField(max_length=20, unique=True, blank=True)  # Auto-generated
+    title = models.CharField(max_length=255, null=True)
     content = models.TextField()
-    zettel_id = models.CharField(max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    category = models.CharField(max_length=50, blank=True, null=True)
-    resource = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    line = models.ManyToManyField(Line, blank=True, null=True, related_name="tags")
+    tags = models.ManyToManyField(Tag, blank=True, null=True, related_name="notes")
+    
+    def save(self, *args, **kwargs):
+        """Automatically generates a unique code before saving the note."""
+        if not self.code:
+            today_str = now().strftime("%Y%m%d")
+            last_note = Note.objects.filter(code__startswith=today_str).order_by('-code').first()
+            last_id = int(last_note.code.split("-")[1]) + 1 if last_note else 1
+            self.code = f"{today_str}-{last_id}"
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.code} - {self.title}"
+
+    def toJSON(self):
+        item = model_to_dict(self, exclude=["created_at", "updated_at"])
+        if self.line:
+            item["line"] = [" "+line.name for line in self.line.all()]
+        item["tags"] = [" "+tag.name for tag in self.tags.all()]
+        return item
+
+class NoteLink(models.Model):
+    """Represents directed relationships between notes (source → target)."""
+    source = models.ForeignKey(Note, related_name='next_notes', on_delete=models.CASCADE)
+    target = models.ForeignKey(Note, related_name='previous_notes', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('source', 'target')  # Prevent duplicate links
 
     def __str__(self):
-        return f"Note {self.zettel_id}"
-    
+        return f"{self.source} → {self.target}"
+
     def toJSON(self):
         item = model_to_dict(self)
         return item
-
-
-# Modelo para la relación many-to-many entre Note y Tag
-class NoteTag(models.Model):
-    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name="note_tags")
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name="note_tags")
-    created_at = models.DateTimeField(auto_now_add=True)  # Fecha de asociación
-
-    def __str__(self):
-        return f"Tag '{self.tag.name}' for Note '{self.note.zettel_id}'"
-
-
-# Modelo para la relación many-to-many entre Note y Line
-class NoteLine(models.Model):
-    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name="note_lines")
-    tag = models.ForeignKey(Line, on_delete=models.CASCADE, related_name="note_lines")
-    created_at = models.DateTimeField(auto_now_add=True)  # Fecha de asociación
-
-    def __str__(self):
-        return f"Tag '{self.tag.name}' for Note '{self.note.zettel_id}'"
-
 
 # Modelo para Multimedia
 class Media(models.Model):
@@ -92,3 +100,4 @@ class Media(models.Model):
 
     def __str__(self):
         return f"{self.file_path} ({self.get_file_type_display()})"
+

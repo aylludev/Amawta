@@ -4,8 +4,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from yachay.forms import NoteForm, NoteTagForm
-from yachay.models import Note
+from yachay.forms import NoteForm, NoteLinkForm
+from yachay.models import Note, NoteLink
 
 class NoteListView(ListView):
     model = Note
@@ -34,7 +34,7 @@ class NoteListView(ListView):
         context['title'] = 'Listado de Notas'
         context['create_url'] = reverse_lazy('note_create')
         context['list_url'] = reverse_lazy('note_list')
-        context['entity'] = 'Tags'
+        context['entity'] = 'Note'
         return context
 
 
@@ -60,11 +60,10 @@ class NoteCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Creación una Etqueta'
+        context['title'] = 'Creación una Nota'
         context['entity'] = 'Etiquetas'
         context['list_url'] = reverse_lazy('note_list')
         context['action'] = 'add'
-        context['tag_form'] = NoteTagForm(self.request.POST)
         return context
 
 class NoteUpdateView(UpdateView):
@@ -93,10 +92,9 @@ class NoteUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Edición una Etiqueta'
-        context['entity'] = 'Tag'
+        context['entity'] = 'Note'
         context['list_url'] = reverse_lazy('note_list')
         context['action'] = 'edit'
-        context['tag_form'] = NoteTagForm(self.request.POST)
         return context
 
 
@@ -120,7 +118,34 @@ class NoteDeleteView(DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Eliminación de Etiqueta'
-        context['entity'] = 'Tag'
+        context['entity'] = 'Note'
         context['list_url'] = self.success_url
         return context
 
+class NoteLinkCreateView(CreateView):
+    model = NoteLink
+    form_class = NoteLinkForm
+    template_name = 'notes/create.html'
+    success_url = reverse_lazy('note_list')
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'add':
+                form = self.get_form()
+                print(form)
+                data = form.save()
+            else:
+                data['error'] = 'No ha ingresado a ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Creación una Nota'
+        context['entity'] = 'Etiquetas'
+        context['list_url'] = reverse_lazy('note_list')
+        context['action'] = 'add'
+        return context
