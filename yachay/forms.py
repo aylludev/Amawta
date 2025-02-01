@@ -1,5 +1,4 @@
 from django import forms
-from django.db.models import Model
 from django.forms import Form, ModelForm, TextInput, fields, widgets
 from yachay.models import *
 
@@ -48,6 +47,18 @@ class LineForm(ModelForm):
             ),
         }
 
+    def save(self, commit=True):
+        data = {}
+        form = super()
+        try:
+            if form.is_valid():
+                form.save()
+            else:
+                data['error'] = form.errors
+        except Exception as e:
+            data['error'] = str(e)
+        return data
+
 class NoteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,3 +98,14 @@ class NoteTagForm(ModelForm):
             'tag': forms.Select(attrs={'class': 'form-control'}),
         }
 
+    def save(self, commit=True):
+        data = {}
+        form = super()
+        try:
+            if form.is_valid():
+                form.save()
+            else:
+                data['error'] = form.errors
+        except Exception as e:
+            data['error'] = str(e)
+        return data

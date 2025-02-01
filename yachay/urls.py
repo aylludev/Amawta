@@ -21,5 +21,4 @@ urlpatterns = [
     path('notes/add/', NoteCreateView.as_view(), name='note_create'),
     path('notes/update/<int:pk>/', NoteUpdateView.as_view(), name='note_update'),
     path('notes/delete/<int:pk>/', NoteDeleteView.as_view(), name='note_delete'),
-    path('tags/autocomplete/', tag_autocomplete, name='tag_autocomplete'),
 ]

@@ -2,11 +2,11 @@
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-dark navbar-primary">
     <div class="container">
-        <a href="{% url 'erp:dashboard' %}" class="navbar-brand">
+        <a href="" class="navbar-brand">
             <img src="{% static 'img/logo.png' %}" alt="AdminLTE Logo"
                  class="brand-image"
                  style="opacity: .8">
-            <span class="brand-text font-weight-light">Hades</span>
+            <span class="brand-text font-weight-light">Amawta</span>
         </a>
         <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,23 +15,23 @@
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a href="{% url 'erp:dashboard' %}" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                    <a href="{% url 'index' %}" class="nav-link"><i class="fas fa-home"></i> Home</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                        class="nav-link dropdown-toggle"><i class="fas fa-folder-open"></i> Mantenimientos</a>
                     <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                        <li><a href="{% url 'erp:category_list' %}" class="dropdown-item"><i
-                                class="fas fa-truck-loading"></i> Categorías</a></li>
-                        <li><a href="{% url 'erp:product_list' %}" class="dropdown-item"><i class="fas fa-boxes"></i>
-                            Productos</a></li>
-                        <li><a href="{% url 'erp:client_list' %}" class="dropdown-item"><i class="fas fa-users"></i>
-                            Clientes</a></li>
-                        <li><a href="{% url 'erp:sale_list' %}" class="dropdown-item"><i
-                                class="fas fa-shopping-cart"></i> Ventas</a></li>
-                        <li><a href="{% url 'sale_report' %}" class="dropdown-item"><i class="fas fa-chart-bar"></i>
-                            Reporte de Ventas</a></li>
-                        <li><a href="{% url 'user:user_list' %}" class="dropdown-item"><i
+                        <li><a href="{% url 'note_list' %}" class="dropdown-item"><i
+                                class="fas fa-truck-loading"></i> Notas </a></li>
+                        <li><a href="{% url 'line_list' %}" class="dropdown-item"><i class="fas fa-boxes"></i>
+                            Lineas</a></li>
+                        <li><a href="{% url 'tag_list' %}" class="dropdown-item"><i class="fas fa-users"></i>
+                            Etiquetas</a></li>
+                        <li><a href="" class="dropdown-item"><i
+                                class="fas fa-shopping-cart"></i> Recursos </a></li>
+                        <li><a href="" class="dropdown-item"><i class="fas fa-chart-bar"></i>
+                            Autores</a></li>
+                        <li><a href="" class="dropdown-item"><i
                                 class="fas fa-user-friends"></i> Usuarios</a></li>
                     </ul>
                 </li>
@@ -64,12 +64,12 @@
                         Sú último acceso fue {{ request.user.last_login }}
                     </span>
                     <div class="dropdown-divider"></div>
-                    <a href="{% url 'user:user_profile' %}" class="dropdown-item">
+                    <a href="" class="dropdown-item">
                         <i class="fas fa-edit mr-2"></i> Editar perfil
                         <span class="float-right text-muted text-sm">3 mins</span>
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a href="{% url 'user:user_change_password' %}" class="dropdown-item">
+                    <a href="" class="dropdown-item">
                         <i class="fas fa-lock mr-2"></i> Editar password
                         <span class="float-right text-muted text-sm">12 hours</span>
                     </a>

@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from yachay.forms import NoteForm, NoteTagForm
-from yachay.models import Note, NoteTag
+from yachay.models import Note
 
 class NoteListView(ListView):
     model = Note
@@ -123,12 +123,4 @@ class NoteDeleteView(DeleteView):
         context['entity'] = 'Tag'
         context['list_url'] = self.success_url
         return context
-
-def tag_autocomplete(request):
-    if 'q' in request.GET:
-        query = request.GET['q']
-        tags = NoteTag.objects.filter(name__icontains=query).values_list('name', flat=True)
-        return JsonResponse(list(tags), safe=False)
-    return JsonResponse([], safe=False)
-
 

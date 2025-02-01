@@ -87,6 +87,8 @@ class LineUpdateView(UpdateView):
                 data['error'] = 'No ha ingresado a ninguna opción'
         except Exception as e:
             data['error'] = str(e)
+            print(data)
+            print(type(data))
         return JsonResponse(data)
 
     def get_context_data(self, **kwargs):
