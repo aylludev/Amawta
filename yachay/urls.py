@@ -1,8 +1,8 @@
 from django.urls import path
+from yachay.views.sources.views import SourceListView, SourceCreateView, SourceUpdateView, SourceDeleteView
 from yachay.views.yachay.views import YachayView
 from yachay.views.notes.views import *
 from yachay.views.tags.views import *
-from yachay.views.lines.views import *
 from yachay.views.author.views import *
 from yachay.views.yachay.views import note_graph, graph_view
 
@@ -12,11 +12,11 @@ urlpatterns = [
     path('tags/add/', TagCreateView.as_view(), name='tag_create'),
     path('tags/update/<int:pk>/', TagUpdateView.as_view(), name='tag_update'),
     path('tags/delete/<int:pk>/', TagDeleteView.as_view(), name='tag_delete'),
-    #line
-    path('lines/', LineListView.as_view(), name='line_list'),
-    path('lines/add/', LineCreateView.as_view(), name='line_create'),
-    path('lines/update/<int:pk>/', LineUpdateView.as_view(), name='line_update'),
-    path('lines/delete/<int:pk>/', LineDeleteView.as_view(), name='line_delete'),
+    #Source
+    path('sources/', SourceListView.as_view(), name='source_list'),
+    path('sources/add/', SourceCreateView.as_view(), name='source_create'),
+    path('sources/update/<int:pk>/', SourceUpdateView.as_view(), name='source_update'),
+    path('sources/delete/<int:pk>/', SourceDeleteView.as_view(), name='source_delete'),
     #note
     path('notes/', NoteListView.as_view(), name='note_list'),
     path('notes/add/', NoteCreateView.as_view(), name='note_create'),

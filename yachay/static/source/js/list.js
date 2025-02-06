@@ -14,7 +14,9 @@ $(function () {
     },
     columns: [
       { "data": "id" },
-      { "data": "name" },
+      { "data": "title" },
+      { "data": "type" },
+      { "data": "author" },
       { "data": "desc" },
     ],
     columnDefs: [
@@ -23,8 +25,8 @@ $(function () {
         class: 'text-center',
         orderable: false,
         render: function (data, type, row) {
-          var buttons = '<a href="/yachay/lines/update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-          buttons += '<a href="/yachay/lines/delete/' + row.id + '/" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+          var buttons = '<a href="/yachay/sources/update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+          buttons += '<a href="/yachay/sources/delete/' + row.id + '/" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
           return buttons;
         }
       },

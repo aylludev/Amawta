@@ -3,10 +3,8 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-
-from yachay.forms import TagForm 
+from yachay.forms import TagForm
 from yachay.models import Tag
-
 
 class TagListView(ListView):
     model = Tag
@@ -37,7 +35,6 @@ class TagListView(ListView):
         context['list_url'] = reverse_lazy('tag_list')
         context['entity'] = 'Tags'
         return context
-
 
 class TagCreateView(CreateView):
     model = Tag
