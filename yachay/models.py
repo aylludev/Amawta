@@ -2,14 +2,15 @@ from django.db import models
 from django.forms import model_to_dict
 from django.utils.timezone import now
 
-# Modelo para Etiquetas
-class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+# Modelo para Autores
+class Author(models.Model):
+    
+    name = models.CharField(max_length=100)
     
     def toJSON(self):
         item = model_to_dict(self)
         return item
-    
+
     def __str__(self):
         return self.name
 
@@ -24,33 +25,29 @@ class Line(models.Model):
     def __str__(self):
         return self.name
 
-# Modelo para Autores
-class Author(models.Model):
-    TYPE_CHOICES = [
-        ('BOOK', 'Book'),
-        ('ESSAY', 'Essay'),
-        ('ARTICLE', 'Article'),
-        ('VIDEO', 'Video'),
-        ('OTHER', 'Other'),
-    ]
-
-    name = models.CharField(max_length=100)
-    source = models.TextField(blank=True, null=True)
-    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='OTHER')
-
+# Modelo para Etiquetas
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+    
     def __str__(self):
-        return f"{self.name} ({self.get_type_display()})"
+        return self.name
 
+#Modelo para Notas 
 class Note(models.Model):
     """Represents a note in the Zettelkasten system."""
     code = models.CharField(max_length=20, unique=True, blank=True)  # Auto-generated
     title = models.CharField(max_length=255, null=True)
     content = models.TextField()
+    author = models.ForeignKey(Author, null=True, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    line = models.ManyToManyField(Line, blank=True, null=True, related_name="tags")
-    tags = models.ManyToManyField(Tag, blank=True, null=True, related_name="notes")
-    
+    line = models.ManyToManyField(Line, blank=True, related_name="tags")
+    tags = models.ManyToManyField(Tag, blank=True, related_name="notes")
+
     def save(self, *args, **kwargs):
         """Automatically generates a unique code before saving the note."""
         if not self.code:
@@ -70,10 +67,11 @@ class Note(models.Model):
         item["tags"] = [" "+tag.name for tag in self.tags.all()]
         return item
 
+#Modelo de links entre Notas
 class NoteLink(models.Model):
     """Represents directed relationships between notes (source → target)."""
-    source = models.ForeignKey(Note, related_name='next_notes', on_delete=models.CASCADE)
-    target = models.ForeignKey(Note, related_name='previous_notes', on_delete=models.CASCADE)
+    source = models.ForeignKey(Note, related_name='next_notes', on_delete=models.PROTECT)
+    target = models.ForeignKey(Note, related_name='previous_notes', on_delete=models.PROTECT)
 
     class Meta:
         unique_together = ('source', 'target')  # Prevent duplicate links
@@ -100,4 +98,22 @@ class Media(models.Model):
 
     def __str__(self):
         return f"{self.file_path} ({self.get_file_type_display()})"
+
+# Modelo para fuentes
+class Source(models.Model):
+    TYPE_CHOICES = [
+        ('BOOK', 'Book'),
+        ('ESSAY', 'Essay'),
+        ('ARTICLE', 'Article'),
+        ('VIDEO', 'Video'),
+        ('OTHER', 'Other'),
+    ]
+
+    title = models.CharField(max_length=50, unique=True)
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='OTHER')
+    author = models.ManyToManyField(Author, blank=True, related_name="author")
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
 

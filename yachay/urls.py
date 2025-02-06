@@ -3,10 +3,10 @@ from yachay.views.yachay.views import YachayView
 from yachay.views.notes.views import *
 from yachay.views.tags.views import *
 from yachay.views.lines.views import *
+from yachay.views.author.views import *
 from yachay.views.yachay.views import note_graph, graph_view
 
 urlpatterns = [
-    path("", YachayView.as_view(), name='index'),
     #tag
     path('tags/', TagListView.as_view(), name='tag_list'),
     path('tags/add/', TagCreateView.as_view(), name='tag_create'),
@@ -24,5 +24,10 @@ urlpatterns = [
     path('notes/update/<int:pk>/', NoteUpdateView.as_view(), name='note_update'),
     path('api/graph/', note_graph, name="note_graph"),
     path('notes/delete/<int:pk>/', NoteDeleteView.as_view(), name='note_delete'),
-    path('graph/', graph_view, name="graph_view"),
+    path('', graph_view, name="index"),
+    #tag
+    path('author/', AuthorListView.as_view(), name='author_list'),
+    path('author/add/', AuthorCreateView.as_view(), name='author_create'),
+    path('author/update/<int:pk>/', AuthorUpdateView.as_view(), name='author_update'),
+    path('author/delete/<int:pk>/', AuthorDeleteView.as_view(), name='author_delete'),
 ]
