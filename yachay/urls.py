@@ -1,10 +1,9 @@
 from django.urls import path
 from yachay.views.sources.views import SourceListView, SourceCreateView, SourceUpdateView, SourceDeleteView
-from yachay.views.yachay.views import YachayView
 from yachay.views.notes.views import *
 from yachay.views.tags.views import *
 from yachay.views.author.views import *
-from yachay.views.yachay.views import note_graph, graph_view
+from yachay.views.yachay.views import note_graph
 
 urlpatterns = [
     #tag
@@ -24,7 +23,6 @@ urlpatterns = [
     path('notes/update/<int:pk>/', NoteUpdateView.as_view(), name='note_update'),
     path('api/graph/', note_graph, name="note_graph"),
     path('notes/delete/<int:pk>/', NoteDeleteView.as_view(), name='note_delete'),
-    path('', graph_view, name="index"),
     #tag
     path('author/', AuthorListView.as_view(), name='author_list'),
     path('author/add/', AuthorCreateView.as_view(), name='author_create'),

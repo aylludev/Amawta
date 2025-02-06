@@ -61,6 +61,7 @@ class Note(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self, exclude=["created_at", "updated_at"])
+        item['source'] = self.source.title if self.source else None 
         item["tags"] = [" "+tag.name for tag in self.tags.all()]
         return item
 
