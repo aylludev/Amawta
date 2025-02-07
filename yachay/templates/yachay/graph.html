@@ -1,0 +1,191 @@
+
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    <script src="https://unpkg.com/cytoscape@3.21.0/dist/cytoscape.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Evita el scroll */
+        }
+        #cy {
+            flex-grow: 1;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+
+<div id="graph-container">
+    <div id="cy"></div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/yachay/graph_data/')
+            .then(response => response.json())
+            .then(data => {
+                let elements = {
+                    nodes: data.nodes.map(node => ({ data: { id: node.id, label: node.title } })),
+                    edges: data.links.map(link => ({ data: { source: link.source, target: link.target } }))
+                };
+
+                let cy = cytoscape({
+                    container: document.getElementById('cy'),
+                    elements: elements,
+style: [
+        {
+            selector: 'node',
+            style: {
+                'background-color': '#007bff', // Azul de Bootstrap 4
+                'label': 'data(label)',
+                'color': 'black',
+                'text-valign': 'center',
+                'text-halign': 'center',
+                'font-size': '10px',
+                'width': 40,  // Tamaño inicial
+                'height': 40,
+                'border-width': 0,
+                'border-color': '#0056b3'
+            }
+        },
+        {
+            selector: 'edge',
+            style: {
+                'width': 2,
+                'line-color': '#cccccc',
+                'target-arrow-color': '#cccccc',
+                'curve-style': 'bezier'
+            }
+        },
+        {
+            selector: 'node:selected',
+            style: {
+                'background-color': '#ffcc00', // Amarillo al seleccionar
+                'border-color': '#ff9900',
+                'border-width': 4
+            }
+        }
+    ],
+                    layout: { name: 'cose' }
+                });
+//Animar los nodos
+function startDrift() {
+    cy.nodes().forEach(node => {
+        function animateNode() {
+            let pos = node.position();
+            let dx = (Math.random() - 0.5) * 100; // Movimiento leve en X (-2.5 a 2.5)
+            let dy = (Math.random() - 0.5) * 100; // Movimiento leve en Y (-2.5 a 2.5)
+
+            node.animate({
+                position: {
+                    x: pos.x + dx,
+                    y: pos.y + dy
+                }
+            }, {
+                duration: 20000,  // Movimiento en 2 segundos
+                easing: 'ease-in-out',
+                complete: animateNode // Llamada recursiva para movimiento continuo
+            });
+        }
+        animateNode();
+    });
+}
+
+// Iniciar animación al cargar el gráfico
+cy.ready(() => {
+    startDrift();
+});
+
+                // Ajustar tamaño al redimensionar la ventana
+                window.addEventListener("resize", () => cy.resize());
+                //Crear una nota con click
+                cy.on('tap', function(event) {
+                  if (event.target === cy) {
+                    window.location.href = '/yachay/notes/add/';
+                  }
+                });
+function updateNodeSizes() {
+    cy.nodes().forEach(function(node) {
+        let degree = node.degree(); // Grado del nodo (cantidad de conexiones)
+        let newSize = Math.min(10 + degree * 5, 100); // Tamaño mínimo 40, aumenta con conexiones, límite de 100
+
+        node.style({
+            'width': newSize,
+            'height': newSize
+        });
+    });
+}
+
+// Aplicar la función al cargar el gráfico
+updateNodeSizes();
+
+// Escuchar cambios en la estructura del gráfico (agregar/borrar enlaces)
+cy.on('add remove', 'edge', function() {
+    updateNodeSizes();
+});
+//Crear links con click
+let selectedNodes = [];
+
+cy.on('tap', 'node', function (event) {
+    let node = event.target;
+
+    // Si ya hemos seleccionado dos nodos, reiniciamos la selección
+    if (selectedNodes.length === 2) {
+        selectedNodes = [];
+    }
+
+    selectedNodes.push(node);
+
+    if (selectedNodes.length === 2) {
+        let sourceId = selectedNodes[0].id();
+        let targetId = selectedNodes[1].id();
+
+        if (sourceId !== targetId) {
+            // Enviar al backend para guardar la relación
+            fetch('/yachay/links/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')  // CSRF token para Django
+                },
+                body: JSON.stringify({ source: sourceId, target: targetId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Agregar el enlace al gráfico si la creación en el backend fue exitosa
+                    cy.add({
+                        group: 'edges',
+                        data: { id: `edge_${sourceId}_${targetId}`, source: sourceId, target: targetId }
+                    });
+                } else {
+                    alert('Error al crear el enlace.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+});
+
+// Función para obtener el CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+            });
+
+    });
+</script>
+{% endblock %}

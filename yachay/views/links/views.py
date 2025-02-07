@@ -3,12 +3,14 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from yachay.forms import NoteForm
-from yachay.models import Note
+from yachay.forms import NoteLinkForm
+from yachay.models import NoteLink, Note
+from django.views import View
+import json
 
-class NoteListView(ListView):
-    model = Note
-    template_name = 'notes/list.html'
+class NoteLinkListView(ListView):
+    model = NoteLink
+    template_name = 'noteslink/list.html'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -20,7 +22,7 @@ class NoteListView(ListView):
             action = request.POST['action']
             if action == 'searchdata':
                 data = []
-                for i in Note.objects.all():
+                for i in NoteLink.objects.all():
                     data.append(i.toJSON())
             else:
                 data['error'] = 'Ha ocurrido un error'
@@ -36,10 +38,10 @@ class NoteListView(ListView):
         context['entity'] = 'Note'
         return context
 
-class NoteCreateView(CreateView):
-    model = Note
-    form_class = NoteForm
-    template_name = 'notes/create.html'
+class NoteLinkCreateView(CreateView):
+    model = NoteLink
+    form_class = NoteLinkForm
+    template_name = 'notes/notelinks.html'
     success_url = reverse_lazy('note_list')
 
     def post(self, request, *args, **kwargs):
@@ -61,13 +63,11 @@ class NoteCreateView(CreateView):
         context['entity'] = 'Etiquetas'
         context['list_url'] = reverse_lazy('note_list')
         context['action'] = 'add'
-        context['source_id'] = self.kwargs.get('source_id', None)
-        context['target_id'] = self.kwargs.get('target_id', None)
         return context
 
 class NoteUpdateView(UpdateView):
-    model = Note
-    form_class = NoteForm
+    model = NoteLink
+    form_class = NoteLinkForm
     template_name = 'tags/create.html'
     success_url = reverse_lazy('note_list')
 
@@ -96,9 +96,8 @@ class NoteUpdateView(UpdateView):
         context['action'] = 'edit'
         return context
 
-
 class NoteDeleteView(DeleteView):
-    model = Note
+    model = NoteLink
     template_name = 'notes/delete.html'
     success_url = reverse_lazy('note_list')
 
@@ -121,3 +120,49 @@ class NoteDeleteView(DeleteView):
         context['list_url'] = self.success_url
         return context
 
+
+@csrf_exempt
+def add_link(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            source_id = data.get('source')
+            target_id = data.get('target')
+
+            # Verificar que ambas notas existan
+            source_note = Note.objects.get(id=source_id)
+            target_note = Note.objects.get(id=target_id)
+
+            # Crear el enlace
+            NoteLink.objects.create(source=source_note, target=target_note)
+
+            return JsonResponse({'success': True})
+        except Note.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Una de las notas no existe'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+class AutoNoteLinkView(View):
+    def get(self, request, *args, **kwargs):
+        data = {}
+
+        # Extraer los parámetros de la URL
+        source_id = request.GET.get('source_id')
+        target_id = request.GET.get('target_id')
+        note_id = request.GET.get('note_id')  # ID de la nueva nota
+
+        if source_id and target_id and note_id:
+            try:
+                # Crear enlaces en ambas direcciones
+                NoteLink.objects.create(source_id=source_id, target_id=note_id)
+                NoteLink.objects.create(source_id=note_id, target_id=target_id)
+
+                data['success'] = f"Enlace creado entre {source_id} <-> {note_id} <-> {target_id}"
+            except Exception as e:
+                data['error'] = str(e)
+        else:
+            data['error'] = "Faltan parámetros en la URL."
+
+        return JsonResponse(data)

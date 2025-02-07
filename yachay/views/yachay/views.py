@@ -1,19 +1,11 @@
-
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from django.shortcuts import render
+from django.http import JsonResponse
 from yachay.models import Note, NoteLink
-from yachay.serializers import NoteSerializer
 
-@api_view(['GET'])
-def note_graph(request):
-    """Devuelve todas las notas en formato de grafo JSON"""
-    notes = Note.objects.all()
-    nodes = []
-    links = []
+def graph_view(request):
+    return render(request, "yachay/graph.html")
 
-    for note in notes:
-        nodes.append({"id": note.id, "title": note.title})
-        for related_note in note.related_notes.all():
-            links.append({"source": note.code, "target": related_note.code})
-
-    return Response({"nodes": nodes, "links": links})
+def graph_data(request):
+    nodes = [{"id": note.id, "title": note.title} for note in Note.objects.all()]
+    links = [{"source": link.source.id, "target": link.target.id} for link in NoteLink.objects.all()]
+    return JsonResponse({"nodes": nodes, "links": links})

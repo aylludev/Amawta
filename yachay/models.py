@@ -57,7 +57,7 @@ class Note(models.Model):
     tags = models.ManyToManyField(Tag, blank=True, related_name="notes")
 
     def __str__(self):
-        return f"{self.code} - {self.title}"
+        return f"{self.title}"
 
     def toJSON(self):
         item = model_to_dict(self, exclude=["created_at", "updated_at"])

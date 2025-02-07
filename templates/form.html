@@ -35,6 +35,8 @@
                         </ul>
                     </div>
                 {% endif %}
+                <input type="hidden" name="source_id" value="{{ source_id }}">
+                <input type="hidden" name="target_id" value="{{ target_id }}">
                 {% for field in form.visible_fields %}
                     <div class="form-group">
                         <label for="email">{{ field.label }}:</label>
