@@ -30,7 +30,8 @@ urlpatterns = [
     path('author/delete/<int:pk>/', AuthorDeleteView.as_view(), name='author_delete'),
     #notelink
     path('links/add/', add_link, name='notelink_create'),
+    path('delete_link/<int:link_id>/', delete_link, name='delete_link'),
     #grap
-    path('', graph_view, name='graph'),
+    path('', graph_view, name='index'),
     path('graph_data/', graph_data, name='graph_data')
 ]

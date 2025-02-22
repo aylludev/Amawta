@@ -144,6 +144,18 @@ def add_link(request):
     
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
+
+@csrf_exempt
+def delete_link(request, link_id):
+    if request.method == "DELETE":
+        try:
+            link = NoteLink.objects.get(id=link_id)
+            link.delete()
+            return JsonResponse({"message": "Relación eliminada"}, status=200)
+        except NoteLink.DoesNotExist:
+            return JsonResponse({"error": "Relación no encontrada"}, status=404)
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
 class AutoNoteLinkView(View):
     def get(self, request, *args, **kwargs):
         data = {}

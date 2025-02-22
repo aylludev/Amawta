@@ -11,6 +11,7 @@
             padding: 0;
             overflow: hidden; /* Evita el scroll */
         }
+
         #cy {
             flex-grow: 1;
             width: 100vw;
@@ -21,139 +22,188 @@
 <div id="graph-container">
     <div id="cy"></div>
 </div>
+
+<!-- Modal -->
+<div id="noteModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noteTitle">Título de la Nota</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Fuente:</strong> <span id="noteSource"></span></p>
+                <p><strong>Contenido:</strong></p>
+                <p id="noteContent"></p>
+                <p><strong>Tags:</strong> <span id="noteTags"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        fetch('/yachay/graph_data/')
-            .then(response => response.json())
-            .then(data => {
-                let elements = {
-                    nodes: data.nodes.map(node => ({ data: { id: node.id, label: node.title } })),
-                    edges: data.links.map(link => ({ data: { source: link.source, target: link.target } }))
-                };
+      fetch('/yachay/graph_data/')
+        .then(response => response.json())
+        .then(data => {
+          let elements = {
+            nodes: data.nodes.map(node => ({ data: { id: node.id, label: node.title, content: node.content, source:node.source, tags:node.tags } })),
+            edges: data.links.map(link => ({ data: { cod:link.id, source: link.source, target: link.target } }))
+          };
 
-                let cy = cytoscape({
-                    container: document.getElementById('cy'),
-                    elements: elements,
-style: [
-        {
-            selector: 'node',
-            style: {
-                'background-color': '#007bff', // Azul de Bootstrap 4
-                'label': 'data(label)',
-                'color': 'black',
-                'text-valign': 'center',
-                'text-halign': 'center',
-                'font-size': '10px',
-                'width': 40,  // Tamaño inicial
-                'height': 40,
-                'border-width': 0,
-                'border-color': '#0056b3'
+          let cy = cytoscape({
+          container: document.getElementById('cy'),
+          elements: elements,
+          
+            style: [
+              {
+                selector: 'node',
+                style: {
+                  'background-color': '#007bff', // Azul de Bootstrap 4
+                  'label': 'data(label)',
+                  'color': 'black',
+                  'text-valign': 'center',
+                  'text-halign': 'center',
+                  'font-size': '10px',
+                  'width': 40,  // Tamaño inicial
+                  'height': 40,
+                  'border-width': 0,
+                  'border-color': '#0056b3'
+                }
+              },
+              {
+                selector: 'edge',
+                style: {
+                  'width': 2,
+                  'line-color': '#cccccc',
+                  'target-arrow-color': '#cccccc',
+                  'curve-style': 'bezier'
+                }
+              },
+              {
+                selector: 'node:selected',
+                style: {
+                  'background-color': '#ffcc00', // Amarillo al seleccionar
+                  'border-color': '#ff9900',
+                  'border-width': 4
+                }
+              }
+            ],
+            layout: { name: 'cose',
             }
-        },
-        {
-            selector: 'edge',
-            style: {
-                'width': 2,
-                'line-color': '#cccccc',
-                'target-arrow-color': '#cccccc',
-                'curve-style': 'bezier'
-            }
-        },
-        {
-            selector: 'node:selected',
-            style: {
-                'background-color': '#ffcc00', // Amarillo al seleccionar
-                'border-color': '#ff9900',
-                'border-width': 4
-            }
-        }
-    ],
-                    layout: { name: 'cose' }
-                });
-//Animar los nodos
-function startDrift() {
-    cy.nodes().forEach(node => {
-        function animateNode() {
-            let pos = node.position();
-            let dx = (Math.random() - 0.5) * 100; // Movimiento leve en X (-2.5 a 2.5)
-            let dy = (Math.random() - 0.5) * 100; // Movimiento leve en Y (-2.5 a 2.5)
+          });
 
-            node.animate({
-                position: {
+          //Animar los nodos
+          function startDrift() {
+            cy.nodes().forEach(node => {
+              function animateNode() {
+                let pos = node.position();
+                let dx = (Math.random() - 0.5) * 10; // Movimiento leve en X (-2.5 a 2.5)
+                let dy = (Math.random() - 0.5) * 10; // Movimiento leve en Y (-2.5 a 2.5)
+
+                node.animate({
+                  position: {
                     x: pos.x + dx,
                     y: pos.y + dy
-                }
-            }, {
-                duration: 20000,  // Movimiento en 2 segundos
-                easing: 'ease-in-out',
-                complete: animateNode // Llamada recursiva para movimiento continuo
-            });
-        }
-        animateNode();
-    });
-}
-
-// Iniciar animación al cargar el gráfico
-cy.ready(() => {
-    startDrift();
-});
-
-                // Ajustar tamaño al redimensionar la ventana
-                window.addEventListener("resize", () => cy.resize());
-                //Crear una nota con click
-                cy.on('tap', function(event) {
-                  if (event.target === cy) {
-                    window.location.href = '/yachay/notes/add/';
                   }
+                }, 
+                {
+                  duration: 2000,  // Movimiento en 2 segundos
+                  easing: 'linear',
+                  complete: animateNode // Llamada recursiva para movimiento continuo
                 });
-function updateNodeSizes() {
-    cy.nodes().forEach(function(node) {
-        let degree = node.degree(); // Grado del nodo (cantidad de conexiones)
-        let newSize = Math.min(10 + degree * 5, 100); // Tamaño mínimo 40, aumenta con conexiones, límite de 100
+              } animateNode();
+            });
+          }
 
-        node.style({
-            'width': newSize,
-            'height': newSize
-        });
-    });
-}
+          // Iniciar animación al cargar el gráfico
+          cy.ready(() => {
+            startDrift();
+          });
 
-// Aplicar la función al cargar el gráfico
-updateNodeSizes();
+          // Ajustar tamaño al redimensionar la ventana
+          window.addEventListener("resize", () => cy.resize());
+          //Crear una nota con click
+          cy.on('tap', function(event) {
+            if (event.target === cy) {
+              window.location.href = '/yachay/notes/add/';
+            }
+          });
 
-// Escuchar cambios en la estructura del gráfico (agregar/borrar enlaces)
-cy.on('add remove', 'edge', function() {
-    updateNodeSizes();
+          function updateNodeSizes() {
+            cy.nodes().forEach(function(node) {
+              let degree = node.degree(); // Grado del nodo (cantidad de conexiones)
+              let newSize = Math.min(20 + degree * 5, 100); // Tamaño mínimo 40, aumenta con conexiones, límite de 100
+
+              node.style({
+                'width': newSize,
+                'height': newSize
+              });
+            });
+          }
+
+          // Aplicar la función al cargar el gráfico
+          updateNodeSizes();
+
+          // Escuchar cambios en la estructura del gráfico (agregar/borrar enlaces)
+          cy.on('add remove', 'edge', function() {
+            updateNodeSizes();
+          });
+          
+cy.on('dbltap', 'node', function(evt) {
+    let event = evt.originalEvent;
+
+    // Verificar que el evento existe y que se usó el botón izquierdo (button === 0)
+        let node = evt.target;
+
+        // Extraer información del nodo
+        let title = node.data('title') || 'Sin título';
+        let content = node.data('content') || 'Sin contenido';
+        let source = node.data('source') || 'Fuente desconocida';
+        let tags = node.data('tags') ? node.data('tags').join(', ') : "Sin etiquetas"; 
+
+        // Mostrar la información en el modal
+        document.getElementById('noteTitle').innerText = title;
+        document.getElementById('noteSource').innerText = source;
+        document.getElementById('noteContent').innerText = content;
+        document.getElementById('noteTags').innerText = tags;
+
+        // Mostrar el modal (Asegúrate de que el modal existe en tu HTML)
+        $('#noteModal').modal('show');
 });
-//Crear links con click
-let selectedNodes = [];
+          //Crear links con click
+          let selectedNodes = [];
+          cy.on('tap', 'node', function (event) {
+            let node = event.target;
 
-cy.on('tap', 'node', function (event) {
-    let node = event.target;
+            // Si ya hemos seleccionado dos nodos, reiniciamos la selección
+            if (selectedNodes.length === 2) {
+              selectedNodes = [];
+            }
 
-    // Si ya hemos seleccionado dos nodos, reiniciamos la selección
-    if (selectedNodes.length === 2) {
-        selectedNodes = [];
-    }
+            selectedNodes.push(node);
 
-    selectedNodes.push(node);
+            if (selectedNodes.length === 2) {
+              let sourceId = selectedNodes[0].id();
+              let targetId = selectedNodes[1].id();
 
-    if (selectedNodes.length === 2) {
-        let sourceId = selectedNodes[0].id();
-        let targetId = selectedNodes[1].id();
-
-        if (sourceId !== targetId) {
-            // Enviar al backend para guardar la relación
-            fetch('/yachay/links/add/', {
+            if (sourceId !== targetId) {
+              // Enviar al backend para guardar la relación
+              fetch('/yachay/links/add/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken')  // CSRF token para Django
                 },
                 body: JSON.stringify({ source: sourceId, target: targetId })
-            })
-            .then(response => response.json())
-            .then(data => {
+              })
+              .then(response => response.json())
+              .then(data => {
                 if (data.success) {
                     // Agregar el enlace al gráfico si la creación en el backend fue exitosa
                     cy.add({
@@ -169,6 +219,40 @@ cy.on('tap', 'node', function (event) {
     }
 });
 
+cy.on('dblclick', 'edge', function(evt) {
+    let edge = evt.target; // Obtiene la arista seleccionada
+    let edgeId = edge.data("cod"); // Obtiene el ID de la relación
+  console.log(edgeId);
+
+    // Enviar solicitud al servidor para eliminar la relación
+    fetch(`/yachay/delete_link/${edgeId}/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'), // Asegúrate de incluir el token CSRF
+            'Content-Type': 'application/json'
+        }
+    })
+
+    .then(response => {
+        if (response.ok) {
+            edge.remove(); // Elimina la arista del gráfico
+        } else {
+            console.error('Error al eliminar la relación');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+// Recorre todos los nodos y cambia el color si no tienen conexiones
+cy.nodes().forEach(node => {
+    let connectedEdges = node.connectedEdges();
+    
+    if (connectedEdges.length === 0) {
+        node.style('background-color', 'red');
+    } else {
+        node.style('background-color', '#007bff'); // Puedes cambiarlo por el color normal
+    }
+});
 // Función para obtener el CSRF token
 function getCookie(name) {
     let cookieValue = null;
@@ -187,5 +271,6 @@ function getCookie(name) {
             });
 
     });
-</script>
+
+</script> -->
 {% endblock %}
